@@ -5,21 +5,8 @@
 ```
 
 ## 1.项目结构说明
+![image](https://github.com/user-attachments/assets/5c4db38b-6bb7-4a8b-9264-1490d28d0ca2)
 
-ping32-lite/
- │
- ├── app.py                 # 应用入口，初始化 Flask 应用、注册蓝图
- ├── models.py              # 数据库模型定义，包括 User、AuditLog 等
- ├── auth.py                # 用户登录、注册与 token 验证逻辑
- ├── file_handler.py         # 文件相关 API 路由（上传、下载、删除、列表、日志）
- ├── templates/
- │   ├── index.html         # 前端首页页面，文件上传/下载/删除的界面
- │   └── audit.html         # 前端登录查看页面
- │   └── audit.html         # 前端登录查看页面
- ├── uploads/               # 文件加密上传保存目录
- ├── secret.key             # 对称加密密钥，生成后自动保存在本地
- ├── templates/ 
- │    └── db.sqlite3             # SQLite 数据库文件，保存用户和审计日志
 
 ## 2. 运行项目
 
