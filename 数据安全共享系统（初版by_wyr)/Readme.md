@@ -32,18 +32,22 @@ python app.py
 
 #### 步骤1：点击app.py运行
 
-![image-20250527122715625](C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20250527122715625.png)
+![image-20250527122715625](https://github.com/user-attachments/assets/d857daeb-4b56-4679-97f2-d1baa77b55c6)
+
 
 #### 步骤2：点击 `* Running on http://127.0.0.1:5000`
 
 #### 步骤3：利用初始密码登录
 
-![image-20250527122812559](C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20250527122812559.png)
+![image-20250527122812559](https://github.com/user-attachments/assets/bac89a16-c46d-494b-abf1-ddfe2f270d02)
+
 
 #### 步骤4：可以进行上传，下载，删除文档
 
-![image-20250527122900492](C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20250527122900492.png)
+![image-20250527122900492](https://github.com/user-attachments/assets/f7b58f3e-95af-486a-b5c3-3940ff7e2a8e)
+
 
 #### 步骤5：点击操作日志，可以查看日志内容
 
-![image-20250527122930191](C:\Users\ASUS\AppData\Roaming\Typora\typora-user-images\image-20250527122930191.png)
+![image-20250527122930191](https://github.com/user-attachments/assets/c8d7f120-a899-45e8-a560-56a31b23d497)
+
