@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>文件管理</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <style>
+    .container { max-width: 900px; margin-top: 50px; }
+    .file-row { display: flex; align-items: center; justify-content: space-between; }
+    .file-row button { margin-left: 10px; }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    .header h2 { margin: 0; }
+    .algorithm-info {
+      background-color: #e9ecef;
+      padding: 10px 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>文件管理平台</h2>
+      <a href="/audit" class="btn btn-outline-primary">查看操作日志</a>
+    </div>
+
+    <!-- 算法信息显示 -->
+    <div class="algorithm-info">
+      <div>
+        <strong>当前加密算法:</strong>
+        <span id="currentAlgorithm">AES</span>
+      </div>
+      <div>
+        <select id="algorithmSelect" class="form-select">
+          <option value="AES">AES</option>
+          <option value="DES">DES</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 上传区 -->
+    <form id="uploadForm" enctype="multipart/form-data">
+      <div class="input-group mb-3">
+        <input type="file" class="form-control" name="file" required>
+        <button class="btn btn-primary" type="submit">上传</button>
+      </div>
+    </form>
+
+    <!-- 文件列表 -->
+    <h4>已上传文件</h4>
+    <ul class="list-group" id="fileList"></ul>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    const headers = { "Authorization": token };
+
+    // 获取当前加密算法
+    async function updateAlgorithm() {
+      const res = await fetch('/api/current_algorithm', { headers });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('currentAlgorithm').textContent = data.algorithm;
+        document.getElementById('algorithmSelect').value = data.algorithm;
+      }
+    }
+
+    // 切换加密算法
+    document.getElementById('algorithmSelect').addEventListener('change', async (e) => {
+      const res = await fetch('/api/set_algorithm', {
+        method: 'POST',
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ algorithm: e.target.value })
+      });
+      const data = await res.json();
+      if (data.success) {
+        updateAlgorithm();
+        alert(data.message);
+      } else {
+        alert('切换失败: ' + data.message);
+      }
+    });
+
+    async function fetchFiles() {
+      const res = await fetch('/api/files', { headers });
+      const data = await res.json();
+      if (data.success) {
+        const list = document.getElementById('fileList');
+        list.innerHTML = '';
+        data.files.forEach(file => {
+          const li = document.createElement('li');
+          li.className = 'list-group-item file-row';
+          li.innerHTML = `
+            <span>${file.filename} | 上传者: ${file.uploader} | 时间: ${file.upload_time}</span>
+            <div>
+              <button class="btn btn-success btn-sm" onclick="downloadFile('${file.filename}')">下载</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteFile('${file.filename}')">删除</button>
+            </div>
+          `;
+          list.appendChild(li);
+        });
+      }
+    }
+
+    async function downloadFile(filename) {
+      try {
+        const res = await fetch(`/api/download/${filename}`, {
+          method: 'GET',
+          headers
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          alert(errorData.message || '下载失败');
+          return;
+        }
+
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      } catch (err) {
+        alert('下载异常');
+        console.error(err);
+      }
+    }
+
+    async function deleteFile(filename) {
+      if (!confirm(`确定要删除 ${filename} 吗？`)) return;
+      const res = await fetch(`/api/delete/${filename}`, {
+        method: 'DELETE',
+        headers
+      });
+      const data = await res.json();
+      if (data.success) fetchFiles();
+      else alert(data.message);
+    }
+
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers,
+        body: formData
+      });
+      const data = await res.json();
+      if (data.success) {
+        e.target.reset();
+        fetchFiles();
+        alert(`上传成功 (使用${data.algorithm}加密)`);
+      } else {
+        alert('上传失败: ' + data.message);
+      }
+    });
+
+    // 初始化页面
+    updateAlgorithm();
+    fetchFiles();
+  </script>
+</body>
+</html>
